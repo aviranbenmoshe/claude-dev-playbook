@@ -1,0 +1,407 @@
+<title>צוות פיתוח בתוך קלוד קוד</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=IBM+Plex+Sans+Hebrew:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one calm reading column (RTL), sticky chapter rail on top, every chapter opens with a "one-sentence" card, then the details. */
+:root{
+  --bg:#F5F6FB; --surface:#FFFFFF; --fg:#141A33; --muted:#565D7E; --line:#DDE1EF;
+  --accent:#5B3FD9; --accent-soft:#ECE8FF; --cyan:#0B7F96; --cyan-soft:#E2F5F8;
+  --good:#1D7A52; --good-soft:#E3F4EC; --warn:#9A6212; --warn-soft:#FBF0DD; --bad:#B23A26; --bad-soft:#FBE6E2;
+  --code-bg:#10163A; --code-fg:#E6E8F7; --code-dim:#8E95C0;
+  --f-display:"Secular One","IBM Plex Sans Hebrew",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Hebrew",system-ui,"Segoe UI",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0F23; --surface:#131937; --fg:#E7E9F6; --muted:#9BA1C2; --line:#262D52;
+  --accent:#A393FF; --accent-soft:#231D4D; --cyan:#4CC6DC; --cyan-soft:#0F2E3A;
+  --good:#5BC796; --good-soft:#12301F; --warn:#E3AE5A; --warn-soft:#33260F; --bad:#F08A76; --bad-soft:#3A1913;
+  --code-bg:#070A1A; --code-fg:#E6E8F7; --code-dim:#7D84AE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0F23; --surface:#131937; --fg:#E7E9F6; --muted:#9BA1C2; --line:#262D52;
+  --accent:#A393FF; --accent-soft:#231D4D; --cyan:#4CC6DC; --cyan-soft:#0F2E3A;
+  --good:#5BC796; --good-soft:#12301F; --warn:#E3AE5A; --warn-soft:#33260F; --bad:#F08A76; --bad-soft:#3A1913;
+  --code-bg:#070A1A; --code-fg:#E6E8F7; --code-dim:#7D84AE; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.75;margin:0}
+.wrap{direction:rtl;padding-inline:16px;padding-block:0 80px}
+.col{max-width:760px;margin-inline:auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.1rem,6vw,3.2rem)}
+h2{font-size:clamp(1.6rem,4.4vw,2.1rem)}
+h3{font-size:1.2rem;margin-block:28px 8px}
+p{margin-block:0 14px}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px;border-radius:4px}
+strong{font-weight:700}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--accent-soft);color:var(--fg);padding:1px 6px;border-radius:5px;direction:ltr;unicode-bidi:isolate}
+ul,ol{padding-inline-start:22px;margin-block:0 14px}
+li{margin-block:4px}
+
+/* hero */
+.hero{padding-block:56px 28px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;color:var(--cyan);font-weight:700;margin-bottom:10px}
+.lede{font-size:1.2rem;color:var(--muted);max-width:60ch;margin-top:16px}
+.big-idea{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 22px 8px}
+.big-idea h2{font-size:1.35rem;margin-bottom:10px;color:var(--accent)}
+.metaphors{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0 14px}
+.metaphor{border-top:2px solid var(--line);padding-top:8px}
+.metaphor b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.05rem}
+.metaphor span{color:var(--muted);font-size:.95rem}
+
+/* chapter rail */
+.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);direction:rtl;margin-inline:-16px;padding-inline:16px}
+.rail ol{list-style:none;display:flex;gap:4px;overflow-x:auto;padding:10px 0;margin:0 auto;max-width:760px;scrollbar-width:thin}
+.rail a{display:block;white-space:nowrap;text-decoration:none;color:var(--muted);font-size:.88rem;padding:5px 11px;border-radius:999px}
+.rail a.on{background:var(--accent);color:var(--surface)}
+.rail a:hover{color:var(--fg)}
+
+section{padding-top:56px;scroll-margin-top:60px}
+.num{font-family:var(--f-mono);font-size:.85rem;color:var(--cyan);display:block;margin-bottom:6px}
+.oneline{background:var(--accent-soft);border-radius:12px;padding:14px 18px;margin-block:16px 22px;font-size:1.08rem}
+.oneline::before{content:"במשפט אחד";display:block;font-size:.75rem;letter-spacing:.08em;font-weight:700;color:var(--accent);margin-bottom:2px}
+
+/* diagnosis */
+.diag{display:grid;gap:12px;margin-top:8px}
+.d{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.d .pill{grid-row:span 3;align-self:start;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.d h3{margin:0;font-size:1.08rem}
+.d p{margin:0;color:var(--muted);font-size:.97rem}
+.d p.fix{color:var(--fg)}
+.d p.fix::before{content:"התיקון: ";font-weight:700;color:var(--good)}
+.stat{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--fg);direction:ltr;unicode-bidi:isolate}
+
+/* rules */
+.rules{counter-reset:r;list-style:none;padding:0;display:grid;gap:14px}
+.rules li{counter-increment:r;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;margin:0}
+.rules li::before{content:counter(r);font-family:var(--f-display);font-size:1.5rem;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--surface);display:grid;place-items:center;line-height:1}
+.rules b{display:block;font-size:1.08rem}
+.rules span{color:var(--muted)}
+
+/* loop */
+.loop{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:0}
+.loop li{display:grid;grid-template-columns:36px 1fr;gap:14px;margin:0;position:relative;padding-bottom:18px}
+.loop li::after{content:"";position:absolute;inset-inline-start:17px;top:36px;bottom:0;width:2px;background:var(--line)}
+.loop li:last-child::after{display:none}
+.loop .n{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-family:var(--f-mono);font-weight:500;background:var(--bg);position:relative;z-index:1}
+.loop b{display:block}
+.loop span{color:var(--muted);font-size:.97rem}
+.say{display:block;margin-top:6px;background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:6px 10px;font-size:.93rem;color:var(--fg)}
+.say::before{content:"מה לכתוב לקלוד: ";color:var(--cyan);font-weight:700}
+
+/* tables */
+.tbl{overflow-x:auto;margin-block:10px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.95rem}
+th,td{text-align:start;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;letter-spacing:.06em;color:var(--muted);font-weight:700;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td .tag{font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.tag.on{background:var(--good-soft);color:var(--good)}
+.tag.proj{background:var(--cyan-soft);color:var(--cyan)}
+.tag.off{background:var(--bad-soft);color:var(--bad)}
+.tag.try{background:var(--warn-soft);color:var(--warn)}
+td code{white-space:nowrap}
+
+/* code blocks */
+.code{position:relative;margin-block:10px 20px;border-radius:12px;background:var(--code-bg);color:var(--code-fg)}
+.code .bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:.8rem;color:var(--code-dim);direction:rtl}
+.code pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--f-mono);font-size:.85rem;line-height:1.7;white-space:pre}
+.code pre[dir="rtl"]{font-family:var(--f-body);font-size:.9rem}
+.copy{font:inherit;font-size:.8rem;background:transparent;color:var(--code-fg);border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:3px 10px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.08)}
+
+/* callouts */
+.note{border-inline-start:4px solid var(--cyan);background:var(--cyan-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin-block:14px 18px}
+[dir="rtl"] .note{border-radius:10px 0 0 10px}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note b:first-child{display:block}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-block:10px 18px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.box h3{margin-top:0}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+
+/* checklist */
+.phase{margin-top:26px}
+.phase h3{margin:0 0 8px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.phase h3 small{font-family:var(--f-body);font-size:.85rem;color:var(--muted)}
+.check{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.check li{margin:0}
+.check label{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.check input{width:20px;height:20px;margin-top:4px;accent-color:var(--accent)}
+.check label:has(input:checked){opacity:.6}
+.check label:has(input:checked) b{text-decoration:line-through}
+.check span{color:var(--muted);font-size:.95rem;display:block}
+.who{font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-inline-start:6px;white-space:nowrap}
+.progress{display:flex;align-items:center;gap:12px;margin-top:10px}
+.progress .track{flex:1;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress .fill{height:100%;width:0;background:var(--accent);transition:width .3s}
+.progress output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted);direction:ltr}
+
+dl.gloss{display:grid;grid-template-columns:minmax(110px,max-content) 1fr;gap:8px 18px;margin:10px 0}
+dl.gloss dt{font-weight:700}
+dl.gloss dd{margin:0;color:var(--muted)}
+.src{font-size:.92rem;color:var(--muted)}
+.src li{margin-block:6px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+@media (max-width:520px){
+  body{font-size:16px}
+  dl.gloss{grid-template-columns:1fr;gap:2px}
+  dl.gloss dd{margin-bottom:10px}
+  .d{grid-template-columns:1fr}
+  .d .pill{grid-row:auto;justify-self:start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap" dir="rtl">
+<div class="col">
+
+<header class="hero">
+  <div class="eyebrow">ספר נהלים פתוח · לכל מי שבונה תוכנה עם קלוד קוד</div>
+  <h1>צוות פיתוח בתוך קלוד קוד</h1>
+  <p class="lede">שיטת עבודה מלאה לבניית אתרים ואפליקציות עם קלוד קוד: מנהל פיתוח, שבעה סוכנים, שומרים אוטומטיים ולמידה מטעויות. היא מתאימה גם למי שלא קורא שורת קוד. מתקינים אותה בפרומפט אחד.</p>
+
+  <div class="big-idea">
+    <h2>הרעיון בשלוש שורות</h2>
+    <p>קלוד הוא כמו <strong>קבלן מבריק שכל בוקר מתעורר עם שכחה מוחלטת.</strong> לכן נותנים לו שלושה דברים:</p>
+    <div class="metaphors">
+      <div class="metaphor"><b>צוות עם תפקידים</b><span>כל סוכן עושה דבר אחד היטב, ואף אחד לא בודק את העבודה של עצמו.</span></div>
+      <div class="metaphor"><b>חוקים שנאכפים</b><span>מה שחייב לקרות תמיד הופך לחוק אוטומטי, ולא נשאר בקשה.</span></div>
+      <div class="metaphor"><b>מחברת לקחים</b><span>כל טעות שתוקנה נרשמת, כדי שלא תחזור באף פרויקט.</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="פרקים">
+  <ol id="rail">
+    <li><a href="#install">התקנה</a></li>
+    <li><a href="#team">הצוות</a></li>
+    <li><a href="#flow">איך עובדים</a></li>
+    <li><a href="#guards">שומרים</a></li>
+    <li><a href="#learn">למידה</a></li>
+    <li><a href="#design">עיצוב</a></li>
+    <li><a href="#tracking">מעקב</a></li>
+    <li><a href="#tokens">חיסכון</a></li>
+    <li><a href="#faq">שאלות</a></li>
+  </ol>
+</nav>
+
+<section id="install">
+  <span class="num">פרק 1</span>
+  <h2>התקנה בפרומפט אחד</h2>
+  <div class="oneline">מורידים את חבילת ההתקנה, פותחים שיחה חדשה בקלוד קוד, ומדביקים את הפרומפט. קלוד שואל כמה שאלות קצרות, ואז מתקין ומוכיח שהכל עובד.</div>
+
+  <h3>מה צריך לפני</h3>
+  <ul>
+    <li>קלוד קוד (באפליקציית Claude, בטרמינל או ב-VS Code), בגרסה 2.1.295 ומעלה.</li>
+    <li>מנוי Pro או Max. Max מומלץ, כי צוות סוכנים צורך יותר.</li>
+    <li>חשבון גיטהאב. קלוד יבדוק אם צריך להתקין משהו, ויסביר איך.</li>
+    <li>רשות: Notion, אם רוצים לנהל שם טיקטים ומדריך למשתמש.</li>
+  </ul>
+
+  <h3>הפרומפט</h3>
+  <p>מחליפים את השורה שבסוגריים בנתיב לתיקיית החבילה במחשב, או בקישור להורדה שקיבלתם.</p>
+  <div class="code"><div class="bar"><span>להדביק בשיחה חדשה בקלוד קוד</span><button class="copy" type="button">העתק</button></div><pre dir="rtl">אני רוצה להתקין אצלי את "ספר הנהלים לקלוד קוד": שיטת עבודה של צוות פיתוח מלא (מנהל פיתוח וצוות סוכנים: ארכיטקט, מעצב, מפתח, כותב בדיקות, סוקר, בודק ממשק ומתעד), חוקי בית, שומרים אוטומטיים, למידה מטעויות, ומעקב טיקטים.
+
+קבצי ההתקנה נמצאים כאן: [נתיב לתיקייה claude-dev-playbook במחשב שלי, או קישור להורדה]
+
+מה לעשות:
+1. תקרא את INSTALL.md מתוך התיקייה, ותעבוד לפיו שלב אחר שלב.
+2. תתחיל בראיון הקצר (שלב 0), ותתאים את הכל אליי: השפה שלי, כמה אני מבין בקוד, מערכת ההפעלה, והאם אני עובד עם Notion.
+3. אל תדרוס שום דבר קיים. קודם גיבוי, ואחר כך מיזוג.
+4. לפני שאתה מתקין תוכנה מחוץ לתיקיית ההגדרות של קלוד, תציג לי רשימה ותחכה לאישור.
+5. אל תבקש ממני סיסמאות או מפתחות בצ'אט. חיבורים שדורשים כניסה אני עושה בעצמי, לפי ההסבר שלך.
+6. בסוף: תוכיח שכל חלק עובד, ותגיד לי בפשטות מה הותקן, ומה אני עושה עכשיו.</pre></div>
+
+  <h3>מה ההתקנה עושה</h3>
+  <ol class="loop">
+    <li><span class="n">1</span><div><b>ראיון קצר</b><span>שם, שפה, כמה אתה מבין בקוד, מערכת הפעלה, Notion, גיטהאב, ובמה אתה בונה. הכל מותאם לתשובות שלך.</span></div></li>
+    <li><span class="n">2</span><div><b>גיבוי</b><span>כל מה שכבר קיים אצלך נשמר בצד לפני שמשהו משתנה.</span></div></li>
+    <li><span class="n">3</span><div><b>התקנה ומיזוג</b><span>חוקי הבית, הסוכנים, הפקודות, השומרים, Context7 והפלאגינים. התקנה של תוכנה רק אחרי שאישרת.</span></div></li>
+    <li><span class="n">4</span><div><b>הוכחה</b><span>כל שומר נבדק בהרצה, וההגדרות נבדקות שהן תקינות.</span></div></li>
+    <li><span class="n">5</span><div><b>שיחה חדשה ומתחילים</b><span>השומרים נטענים בשיחה חדשה. בתיקייה ריקה כותבים <code>/new-project</code> ואת הרעיון.</span></div></li>
+  </ol>
+</section>
+
+<section id="team">
+  <span class="num">פרק 2</span>
+  <h2>הצוות</h2>
+  <div class="oneline">אתה מדבר רק עם מנהל הפיתוח, השיחה הראשית. הוא מחלק את העבודה, מעביר אותה בין הסוכנים, ועוצר אצלך רק כשצריך החלטה.</div>
+  <div class="tbl"><table>
+    <thead><tr><th>סוכן</th><th>מה הוא עושה</th><th>מודל</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ארכיטקט</strong></td><td>מראיין אותך דרך המנהל, ומתכנן ארכיטקטורה ותוכנית שמתאימות לקוד הקיים. לא כותב קוד.</td><td>Opus</td></tr>
+      <tr><td><strong>מעצב</strong></td><td>שפה עיצובית, 2-3 כיוונים כתמונות לבחירתך, והדמיה לכל מסך חדש.</td><td>Sonnet</td></tr>
+      <tr><td><strong>מפתח</strong></td><td>כותב קוד בענף נפרד, עם הסבר לכל קובץ ולכל פונקציה. עולה ל-Opus במשימה גדולה.</td><td>Sonnet</td></tr>
+      <tr><td><strong>כותב בדיקות</strong></td><td>בדיקה לכל מבחן קבלה, ובדיקה לכל באג שתוקן.</td><td>Sonnet</td></tr>
+      <tr><td><strong>סוקר</strong></td><td>קוד ואבטחה בעיניים טריות, ו"פרקליט השטן" לתוכניות. קורא בלבד.</td><td>Opus</td></tr>
+      <tr><td><strong>בודק ממשק</strong></td><td>עובר על המסכים בדפדפן, במחשב ובטלפון, משווה להדמיה, בודק נגישות ומצלם הוכחות.</td><td>Sonnet</td></tr>
+      <tr><td><strong>מתעד</strong></td><td>מעדכן את מדריך המשתמש עם צילומי מסך, ואת יומן הגרסאות.</td><td>Sonnet</td></tr>
+    </tbody>
+  </table></div>
+  <p>הסוקר והארכיטקט חזקים יותר מהמפתח בכוונה, כי טעות בתוכנית או באג שעבר את הסקירה עולים הכי ביוקר. כל סוכן מקבל מהמנהל "דף הקשר" קבוע, כי הוא לא רואה את השיחה.</p>
+</section>
+
+<section id="flow">
+  <span class="num">פרק 3</span>
+  <h2>איך עובדים</h2>
+  <div class="oneline">שתי פקודות. כל השאר קורה מעצמו, עם שלוש נקודות שבהן אתה מחליט.</div>
+  <div class="two">
+    <div class="box"><h3><code>/new-project</code></h3><ol>
+      <li><strong>אפיון:</strong> ראיון, ארכיטקטורה, ופרקליט שטן. אתה מאשר.</li>
+      <li><strong>שפה עיצובית:</strong> משפט, דוגמאות, ו-2-3 כיוונים. אתה בוחר.</li>
+      <li><strong>תשתית:</strong> גיטהאב, קבצי הפרויקט, בדיקות אוטומטיות ומעקב. אתה מאשר.</li>
+      <li><strong>עבודה:</strong> מתחילים מגרסה רזה שעובדת מקצה לקצה.</li>
+    </ol></div>
+    <div class="box"><h3><code>/feature</code></h3><ul>
+      <li><strong>קטן:</strong> מפתח, בדיקות, סקירה מובנית, אישור.</li>
+      <li><strong>בינוני:</strong> אפיון קצר, הדמיה, מפתח, בדיקות, סוקר, בודק ממשק, מתעד, אישור.</li>
+      <li><strong>גדול:</strong> כל הצוות, כולל ארכיטקט ופרקליט שטן.</li>
+    </ul></div>
+  </div>
+  <h3>שלוש נקודות האישור שלך</h3>
+  <ol class="rules">
+    <li><div><b>האפיון</b><span>מה בונים, ומבחני הקבלה: מה בדיוק צריך לקרות כדי שזה ייחשב גמור.</span></div></li>
+    <li><div><b>התוכנית</b><span>מה ייבנה, איך זה ייראה (תמונות ההדמיה), מה עלול להיפגע, ומה זה יעלה.</span></div></li>
+    <li><div><b>המיזוג</b><span>אחרי שבדקת בעצמך בכתובת ניסיון וראית צילומי מסך. בלי "מאשר" שלך, שום דבר לא נכנס.</span></div></li>
+  </ol>
+</section>
+
+<section id="guards">
+  <span class="num">פרק 4</span>
+  <h2>השומרים האוטומטיים</h2>
+  <div class="oneline">קלוד יכול לשכוח בקשה. הוא לא יכול לעקוף חוק שהמחשב אוכף בעצמו.</div>
+  <div class="tbl"><table>
+    <thead><tr><th>שומר</th><th>מה הוא עושה</th></tr></thead>
+    <tbody>
+      <tr><td><strong>בלי git אין עבודה</strong></td><td>חוסם עריכת קבצים בתיקייה בלי נקודות שמירה. תמיד אפשר לחזור לגרסה שעבדה.</td></tr>
+      <tr><td><strong>אין סודות ב-commit</strong></td><td>לפני כל שמירה סורק מפתחות, טוקנים, סיסמאות וקובצי ‎.env, וחוסם אם נמצא משהו.</td></tr>
+      <tr><td><strong>סיימתי = הוכחה</strong></td><td>לפני שקלוד מסיים, הבדיקות של הפרויקט רצות. אם הן נכשלות, הוא חוזר לעבודה.</td></tr>
+      <tr><td><strong>פקודות חסומות</strong></td><td>דחיפה בכוח, דחיפה ישירה לגרסה הראשית, ומחיקת מסד נתונים מרוחק.</td></tr>
+      <tr><td><strong>פקודות באישור</strong></td><td>מחיקת תיקיות, שינוי מסד הנתונים בענן, מיזוג, ועלייה לאוויר.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="learn">
+  <span class="num">פרק 5</span>
+  <h2>למידה מטעויות</h2>
+  <div class="oneline">"תיקון = לקח". כל תקלה שנפתרה נרשמת במקום הנכון, וכל סוכן קורא את הלקחים שלו לפני שהוא מתחיל.</div>
+  <ul>
+    <li><strong>לקח כללי</strong> נרשם במחברת שנטענת בכל פרויקט. אתה מאשר כל שורה.</li>
+    <li><strong>לקח לתפקיד</strong> נרשם בקובץ של הסוכן, למשל לבודק הממשק: "תמיד לבדוק גם בטלפון".</li>
+    <li><strong>לקח לפרויקט</strong> נרשם ב"מוקשים" של הפרויקט.</li>
+    <li><strong>כל באג שתוקן</strong> מקבל בדיקה אוטומטית, כדי שלא יחזור לעולם.</li>
+    <li><strong>פעם בשבוע</strong> סקירה אוטומטית מוצאת טעויות שחזרו, מציעה לקחים ומנקה כפילויות.</li>
+  </ul>
+</section>
+
+<section id="design">
+  <span class="num">פרק 6</span>
+  <h2>עיצוב</h2>
+  <div class="oneline">אין לך מעצב, אז יש לצוות מעצב. הוא לא מחליט במקומך. הוא מראה תמונות, ואתה בוחר.</div>
+  <ol class="loop">
+    <li><span class="n">1</span><div><b>משפט ודוגמאות</b><span>משפט אחד שהמוצר צריך להרגיש, ו-2-3 אפליקציות או אתרים שאתה אוהב.</span></div></li>
+    <li><span class="n">2</span><div><b>2-3 כיוונים כתמונות</b><span>מסכים אמיתיים, במחשב ובטלפון. אתה בוחר כיוון, או משלב.</span></div></li>
+    <li><span class="n">3</span><div><b>ספר מותג</b><span>צבעים, גופנים, רכיבים, נגישות, ומצב כהה. כל מפתח עובד לפיו.</span></div></li>
+    <li><span class="n">4</span><div><b>הדמיה לכל מסך חדש</b><span>מאושרת יחד עם התוכנית. אחרי הבנייה הבודק משווה את המסך להדמיה.</span></div></li>
+  </ol>
+</section>
+
+<section id="tracking">
+  <span class="num">פרק 7</span>
+  <h2>מעקב: מה קורה בכל רגע</h2>
+  <div class="oneline">כל טיקט, כל בדיקה וכל אישור מתועדים, כולל צילומי מסך. מדריך המשתמש של המוצר מתעדכן בכל שינוי.</div>
+  <div class="two">
+    <div class="box"><h3>עם Notion</h3><p>"מרכז פיתוח" עם שלוש טבלאות: פרויקטים, טיקטים (עם לוח עבודה לפי סטטוס), וריצות בדיקה. מדריך למשתמש לכל מוצר כעמוד ב-Notion.</p></div>
+    <div class="box"><h3>בלי Notion</h3><p>הכל נשמר כקבצים בתוך הפרויקט: טבלת טיקטים, תיעוד בדיקות, ומדריך משתמש. הכל ב-git, עם היסטוריה מלאה.</p></div>
+  </div>
+</section>
+
+<section id="tokens">
+  <span class="num">פרק 8</span>
+  <h2>חיסכון במכסה</h2>
+  <div class="oneline">כל הודעה, קלוד קורא מחדש את כל השיחה ואת רשימת הכלים. שיחות קצרות וכלים מעטים = יותר עבודה על אותה מכסה.</div>
+  <ul>
+    <li><strong>משימה אחת = שיחה אחת.</strong> זה החיסכון הכי גדול.</li>
+    <li><strong>גודל משימה נכון:</strong> לא מריצים את כל הצוות על תיקון טקסט.</li>
+    <li><strong>מודל לפי תפקיד:</strong> Opus רק לתכנון ולסקירה, ו-Sonnet לשאר.</li>
+    <li><strong>פחות כלים:</strong> אחרי שבוע עבודה מריצים <code>/skill-doctor</code> ומכבים מה שלא בשימוש.</li>
+  </ul>
+</section>
+
+<section id="faq">
+  <span class="num">פרק 9</span>
+  <h2>שאלות נפוצות</h2>
+  <h3>זה ידרוס לי הגדרות קיימות?</h3>
+  <p>לא. קודם גיבוי ל-<code>~/.claude/backups/</code>, ואחר כך מיזוג. אם יש התנגשות, קלוד שואל.</p>
+  <h3>אני מפתח. זה לא יותר מדי?</h3>
+  <p>בראיון בוחרים "מפתח", וההסברים יהיו קצרים ומדויקים. במשימות קטנות רצים רק המפתח והבדיקות.</p>
+  <h3>זה עולה כסף?</h3>
+  <p>הכל כלול במנוי. הדבר היחיד שעולה כסף הוא סקירת ענן מורחבת (<code>/code-review ultra</code>), והיא רצה רק באישור שלך.</p>
+  <h3>איפה זה עובד?</h3>
+  <p>בכל פרויקט במחשב שבו הותקן. בשיחות ענן או במחשב אחר צריך להתקין שוב.</p>
+</section>
+
+<footer>
+  <p>מבוסס על התיעוד הרשמי של Claude Code ועל שיטות העבודה שמומלצות ב-2026: תוכנית לפני קוד, הוכחה לפני "סיימתי", סקירה בעיניים טריות, וחוקים שנאכפים במקום בקשות.</p>
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  // copy buttons
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var pre=btn.closest('.code').querySelector('pre');
+      var text=pre.innerText;
+      var done=function(){btn.textContent='הועתק';setTimeout(function(){btn.textContent='העתק'},1600)};
+      var fallback=function(){var r=document.createRange();r.selectNodeContents(pre);var s=window.getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='סומן, העתק ידנית'};
+      try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}
+    });
+  });
+  // checklist
+  var boxes=[].slice.call(document.querySelectorAll('.check input'));
+  var KEY='cc-guide-checks';
+  var saved={};
+  try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+  function update(){
+    var n=boxes.filter(function(b){return b.checked}).length;
+    var c=document.getElementById('count'); if(!c) return; c.textContent=n+'/'+boxes.length;
+    document.getElementById('fill').style.width=(n/boxes.length*100)+'%';
+  }
+  boxes.forEach(function(b){
+    if(saved[b.id])b.checked=true;
+    b.addEventListener('change',function(){
+      saved[b.id]=b.checked;
+      try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}
+      update();
+    });
+  });
+  update();
+  // active chapter in rail
+  var links=[].slice.call(document.querySelectorAll('#rail a'));
+  var map={};links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(l){l.classList.remove('on')});
+          var a=map[e.target.id];
+          if(a){a.classList.add('on');a.scrollIntoView({block:'nearest',inline:'center'})}
+        }
+      });
+    },{rootMargin:'-40% 0px -55% 0px'});
+    document.querySelectorAll('section[id]').forEach(function(s){io.observe(s)});
+  }
+})();
+</script>
