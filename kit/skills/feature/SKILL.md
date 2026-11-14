@@ -1,6 +1,6 @@
 ---
 name: feature
-description: Run one piece of development work (feature, change, or bug) through the dev team, as the dev manager - size it, spec it, plan it, hand it station to station (architect, designer, developer, test-writer, reviewer, qa-browser, docs-writer), track it in Notion, open a PR and merge only after Aviran approves. Use when Aviran asks for a new feature, a change, or a bug fix in a code project ("פיצ'ר", "תוסיף", "תשנה", "באג", "/feature").
+description: Run one piece of development work (feature, change, or bug) through the dev team, as the dev manager - size it, spec it, plan it, hand it station to station (architect, designer, developer, test-writer, reviewer, qa-browser, docs-writer), track it in Notion, open a PR and merge only after the user approves. Use when the user asks for a new feature, a change, or a bug fix in a code project ("פיצ'ר", "תוסיף", "תשנה", "באג", "/feature").
 ---
 
 # /feature: מנהל הפיתוח מריץ משימה דרך הצוות

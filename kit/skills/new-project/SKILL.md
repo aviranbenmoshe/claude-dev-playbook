@@ -1,6 +1,6 @@
 ---
 name: new-project
-description: Start a new project (or bring an existing one up to standard) as the dev manager, in a fixed order - 1) spec and architecture with Aviran, then design language with the designer agent, 2) infrastructure for the dev team (git, private GitHub repo, CLAUDE.md, docs, agent lessons, Notion project + user guide, CI), 3) first work via /feature starting with a walking skeleton. Use when Aviran says "פרויקט חדש", "new project", "/new-project", or when a code folder has no git, no CLAUDE.md, or no spec.
+description: Start a new project (or bring an existing one up to standard) as the dev manager, in a fixed order - 1) spec and architecture with the user, then design language with the designer agent, 2) infrastructure for the dev team (git, private GitHub repo, CLAUDE.md, docs, agent lessons, Notion project + user guide, CI), 3) first work via /feature starting with a walking skeleton. Use when the user says "פרויקט חדש", "new project", "/new-project", or when a code folder has no git, no CLAUDE.md, or no spec.
 ---
 
 # /new-project: פתיחת פרויקט, לפי הסדר
