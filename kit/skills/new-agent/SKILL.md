@@ -1,6 +1,6 @@
 ---
 name: new-agent
-description: Build an AI agent or automation end to end as the dev manager - in n8n, in code (Claude API / Tool Runner / Agent SDK / Managed Agents), or a hybrid with an MCP server. Fixed order with approval gates - discovery, agent architecture (patterns, tools, memory, helper tables, where each part runs), evals first, build in DEV only, tests and red-team, review, pilot, human activation, monitoring. Use when the user asks for an AI agent, an "AI employee", an n8n automation/agent, or agent architecture ("סוכן", "אוטומציה", "n8n", "/new-agent").
+description: "Build an AI agent or automation end to end as the dev manager - in n8n, in code (Claude API / Tool Runner / Agent SDK / Managed Agents), or a hybrid with an MCP server. Fixed order with approval gates - discovery, agent architecture (patterns, tools, memory, helper tables, where each part runs), evals first, build in DEV, tests and red-team, review, pilot, then a production release and ongoing maintenance done by Claude only after the user explicitly approves each release (two-layer approval: chat approval plus a hook on every production write). Use when the user asks for an AI agent, an \"AI employee\", an n8n automation/agent, or agent architecture (\"סוכן\", \"אוטומציה\", \"n8n\", \"/new-agent\")."
 ---
 
 # /new-agent: סוכן AI או אוטומציה, ב-n8n, בקוד או בשילוב
@@ -29,7 +29,7 @@ description: Build an AI agent or automation end to end as the dev manager - in 
 - הפעל את `eval-engineer` במצב 1: 20-50 מקרים (יכולת, רגרסיה, ניסיונות פריצה), בודקים, ורף הצלחה.
 - הצג למשתמש: דוגמאות מהמקרים, והרף. **חכה ל"מאשר".** זו ההגדרה של "גמור".
 
-## שלב 4: בנייה (רק בסביבת פיתוח)
+## שלב 4: בנייה (בסביבת הפיתוח)
 - ענף `agent/<שם>` או worktree.
 - **חלקים ב-n8n:** `automation-builder`. **חלקים בקוד או שרת MCP:** `developer` (עם `claude-api` ו-`mcp-builder`). בשילוב: קודם שרת ה-MCP או השירות, אחר כך התהליך ב-n8n שקורא לו.
 - טבלאות העזר נוצרות לפי הארכיטקטורה, קודם בפיתוח.
@@ -48,20 +48,34 @@ description: Build an AI agent or automation end to end as the dev manager - in 
 - הדגמה למשתמש (ולבעלי התהליך) בסביבת הפיתוח עם נתונים שדומים לאמיתיים. אפשר "מצב הצעה": הסוכן מכין, אדם מבצע, ומשווים.
 - **חכה ל"מאשר".**
 
-## שלב 8: הפעלה ✅
-- "חבילת גרסה" אחת בתגית git: תהליכי n8n, הנחיות, הגדרות כלים, מזהה המודל, ותוצאות המבחנים. כך אפשר לחזור אחורה בצעד אחד.
-- **ההעברה לייצור וההפעלה נעשות על ידי אדם**, לפי הוראות שאתה כותב (ייבוא התהליך, חיבור Credentials, הפעלה). קלוד קוד אף פעם לא מחובר ל-n8n של ייצור.
-- **רק אחרי "מאשר" מפורש.**
+## שלב 8: שחרור לייצור ✅
+לפי "נוהל שחרור לייצור" למטה. **רק אחרי "מאשר" מפורש לאותו שחרור.**
 
-## שלב 9: אחרי ההפעלה
-- שבוע ראשון: מעקב אחרי ריצות, תקלות, אישורים ועלות.
+## שלב 9: אחרי ההפעלה (תחזוקה)
+- שבוע ראשון: מעקב אחרי ריצות, תקלות, אישורים ועלות, דרך החיבור לייצור (קריאה בלבד, בלי אישור).
+- **תקלה בייצור:** מאבחנים בקריאה בלבד (ריצות, שגיאות), מציגים למשתמש מה קרה ומה מוצע (תיקון או חזרה לגרסה הקודמת), ומבצעים לפי נוהל השחרור אחרי "מאשר". תקלה חמורה שפוגעת בלקוחות: מותר להציע מיד כיבוי או חזרה לגרסה קודמת, וגם זה באישור.
 - כל תקלה או תיקון מהשטח הופכים למקרה רגרסיה ("תיקון = לקח").
 - עדכון PROGRESS ומעקב, וסיכום למשתמש.
 
+## נוהל שחרור לייצור (גם ל-/feature, לתיקונים ולחזרה לגרסה קודמת)
+1. **תנאים:** המבחנים עברו את הרף, הסקירה בלי בעיות חמורות, והכל ב-git (תהליכים, הנחיות, מזהה מודל, תוצאות מבחנים) עם תגית גרסה.
+2. **בקשת אישור בצ'אט**, בשפה פשוטה:
+   - אילו תהליכים או שירותים ישתנו בייצור, ומה ההבדל מהגרסה שרצה עכשיו.
+   - אילו חיבורים (Credentials) צריכים להיות קיימים בייצור. חסר: המשתמש יוצר אותם לפני כן.
+   - תוכנית חזרה: מאיזו גרסה נחזור אם משהו ישתבש, ואיך.
+   - מתי זה יקרה, ומי יכול להיות מושפע.
+   **חכה ל"מאשר" מפורש.** אישור אחד = שחרור אחד, לרשימה הזו בלבד.
+3. **ביצוע:** ב-n8n `automation-builder` במצב שחרור (גיבוי, העלאה כבויה, בדיקת עשן עם נתוני דוגמה, הפעלה). בקוד `developer` (למשל `vercel --prod` או `fly deploy`). כל פעולת כתיבה בייצור תעצור לאישור נוסף. זו שכבת הגנה שנייה, לא תקלה.
+4. **אחרי:** מעקב על הריצות הראשונות, תיעוד במעקב (ריצת "בדיקה אחרי עלייה"), תגית git ו-CHANGELOG. בעיה: מציגים ומציעים חזרה לגרסה קודמת, באישור.
+5. **לעולם לא:** לשנות בייצור משהו שלא היה ברשימה שאושרה, ליצור או לשנות סיסמאות, או להריץ בייצור תהליך שכותב או שולח לצורך בדיקה.
+
 ## חיבור ל-n8n
-- **שרת ה-MCP הרשמי של n8n** (גרסה 2.13 ומעלה לבנייה ועריכה): המשתמש מדליק אותו ב-Settings > Instance-level MCP, מאפשר גישה לתהליכים הרלוונטיים, ומתחבר בחלון החיבור (Claude Code). אל תבקש ממנו טוקנים בצ'אט.
+- **שני חיבורים נפרדים:**
+  - `n8n-dev`: n8n מקומי (`npx n8n` או Docker) או סביבת פיתוח. בו בונים ובודקים חופשי.
+  - `n8n-prod`: ה-n8n של הייצור. קריאה חופשית לצורך מעקב ואבחון. כל פעולה אחרת עוצרת לאישור, כי hook תופס כל חיבור ששמו נגמר ב-`-prod`.
+- **איך מחברים:** שרת ה-MCP הרשמי של n8n (גרסה 2.13 ומעלה לבנייה ועריכה). המשתמש מדליק אותו ב-Settings > Instance-level MCP, מאפשר גישה לתהליכים הרלוונטיים, ומתחבר: `claude mcp add --transport http n8n-dev <כתובת>/mcp-server/http`, ובאותה צורה `n8n-prod`, עם החיבור בחלון ה-OAuth. אל תבקש ממנו טוקנים בצ'אט.
 - **אופציונלי:** n8n-mcp ו-n8n-skills (קהילתיים) לידע על nodes ולבדיקות. מתקינים רק באישור המשתמש, בגרסה נעולה.
-- n8n מקומי לפיתוח: `npx n8n` או Docker. ב-n8n שרץ בייצור מפעילים "protected instance", שחוסם כל שינוי דרך MCP.
+- **עדיף שני שרתי n8n נפרדים** לפיתוח ולייצור. אם יש רק אחד: פרויקטים נפרדים, תהליכי פיתוח עם [DEV] בשם, וגישת MCP רק לתהליכים של הסביבה הנכונה.
 
 ## מבנה התיקייה
 ```

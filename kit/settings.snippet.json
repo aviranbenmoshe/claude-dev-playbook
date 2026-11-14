@@ -52,6 +52,18 @@
             "statusMessage": "בודק שאין סודות ב-commit"
           }
         ]
+      },
+      {
+        "matcher": "mcp__.*-prod__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{HOOKS_DIR}}/prod-guard.js\"",
+            "timeout": 10,
+            "onFailure": "block",
+            "statusMessage": "בודק פעולה בסביבת ייצור"
+          }
+        ]
       }
     ],
     "Stop": [
