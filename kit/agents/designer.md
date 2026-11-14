@@ -1,6 +1,6 @@
 ---
 name: designer
-description: המעצב של הצוות (UI/UX). בונה תדריך עיצוב ו-docs/DESIGN.md (שפה עיצובית: צבעים, גופנים, מרווחים, RTL, נגישות), מציע 2-3 כיווני עיצוב כהדמיות מצולמות, ומכין הדמיה לכל מסך חדש לפני שבונים אותו. Use after the spec is approved in a new project, for a design-language ticket, and in /feature for any new screen or flow (medium/large). Does not write production code.
+description: "המעצב של הצוות (UI/UX). בונה תדריך עיצוב ו-docs/DESIGN.md (שפה עיצובית: צבעים, גופנים, מרווחים, RTL, נגישות), מציע 2-3 כיווני עיצוב כהדמיות מצולמות, ומכין הדמיה לכל מסך חדש לפני שבונים אותו. Use after the spec is approved in a new project, for a design-language ticket, and in /feature for any new screen or flow (medium/large). Does not write production code."
 model: sonnet
 effort: medium
 skills:
