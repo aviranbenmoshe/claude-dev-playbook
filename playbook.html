@@ -10,7 +10,7 @@
   --good:#1D7A52; --good-soft:#E3F4EC; --warn:#9A6212; --warn-soft:#FBF0DD; --bad:#B23A26; --bad-soft:#FBE6E2;
   --code-bg:#0B1020; --code-fg:#E9ECFA; --code-dim:#8E97C2;
   --grad:linear-gradient(100deg,#22D3EE,#5B8CFF 45%,#7C5CFF);
-  --logo-light:block; --logo-dark:none;
+  --logo-light:block; --logo-dark:none; --btn-ink:#FFFFFF;
   --f-display:"Secular One","IBM Plex Sans Hebrew",system-ui,sans-serif;
   --f-body:"IBM Plex Sans Hebrew",system-ui,"Segoe UI",Arial,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
@@ -21,14 +21,14 @@
   --good:#5BC796; --good-soft:#12301F; --warn:#E3AE5A; --warn-soft:#33260F; --bad:#F08A76; --bad-soft:#3A1913;
   --code-bg:#060914; --code-fg:#E9ECFA; --code-dim:#7D86B4;
   --grad:linear-gradient(100deg,#22D3EE,#5B8CFF 45%,#7C5CFF);
-  --logo-light:none; --logo-dark:block; color-scheme:dark}}
+  --logo-light:none; --logo-dark:block; --btn-ink:#0B1020; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0B1020; --surface:#131A33; --fg:#F5F7FF; --muted:#9AA4C7; --line:#252E52;
   --accent:#9D86FF; --accent-soft:#211A4A; --cyan:#22D3EE; --cyan-soft:#0C2D3A;
   --good:#5BC796; --good-soft:#12301F; --warn:#E3AE5A; --warn-soft:#33260F; --bad:#F08A76; --bad-soft:#3A1913;
   --code-bg:#060914; --code-fg:#E9ECFA; --code-dim:#7D86B4;
   --grad:linear-gradient(100deg,#22D3EE,#5B8CFF 45%,#7C5CFF);
-  --logo-light:none; --logo-dark:block; color-scheme:dark}
+  --logo-light:none; --logo-dark:block; --btn-ink:#0B1020; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:17px;line-height:1.75;margin:0}
@@ -173,7 +173,7 @@ html{scroll-behavior:smooth}
 .hero::before{content:"";position:absolute;inset-inline:-16px;top:0;height:4px;background:var(--grad);border-radius:0 0 4px 4px}
 .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;font-weight:700;text-decoration:none;font-size:.95rem}
-.btn.primary{background:var(--accent);color:#FFFFFF}
+.btn.primary{background:var(--accent);color:var(--btn-ink)}
 .btn.ghost{border:1px solid var(--line);color:var(--fg);background:var(--surface)}
 .btn:hover{filter:brightness(1.08)}
 footer .brandfoot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
