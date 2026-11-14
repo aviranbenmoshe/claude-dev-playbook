@@ -1,4 +1,15 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-white.png">
+    <img src="assets/logo-navy.png" alt="Think AI" width="360">
+  </picture>
+</p>
+
+<div dir="rtl">
+
 # ספר הנהלים לקלוד קוד
+
+**[📖 לקריאת הספר המלא](https://aviranbenmoshe.github.io/claude-dev-playbook/)** · AI שעובד בתוך הארגון
 
 שיטת עבודה מלאה לפיתוח תוכנה עם קלוד קוד, שמתאימה גם למי שלא קורא קוד. מתקינים אותה בפרומפט אחד, והיא עובדת בכל פרויקט במחשב.
 
@@ -13,9 +24,11 @@
 - **תיעוד עדכני:** Context7 מביא לקלוד את התיעוד העדכני של כל ספרייה.
 
 ## איך מתקינים
-1. מורידים את התיקייה הזו (או `git clone`).
-2. פותחים שיחה חדשה בקלוד קוד, ומדביקים את הפרומפט מ-[SETUP-PROMPT.md](SETUP-PROMPT.md).
+1. פותחים שיחה חדשה בקלוד קוד (באפליקציית Claude, בטרמינל או ב-VS Code).
+2. מדביקים את הפרומפט מ-[SETUP-PROMPT.md](SETUP-PROMPT.md). קלוד מוריד את החבילה מכאן לבד.
 3. עונים על כמה שאלות קצרות, ומאשרים את ההתקנות.
+
+אפשר גם להוריד ידנית: `git clone https://github.com/aviranbenmoshe/claude-dev-playbook.git`, או Code ואז Download ZIP.
 
 ## מה צריך
 - קלוד קוד בגרסה 2.1.295 ומעלה, ומנוי Pro או Max (Max מומלץ לעבודה עם צוות).
@@ -26,6 +39,8 @@
 | קובץ | מה זה |
 |---|---|
 | `SETUP-PROMPT.md` | הפרומפט להדבקה |
+| `docs/index.html` | הספר המלא (מוצג ב-GitHub Pages) |
+| `playbook.html` | אותו ספר, בגרסה לשיתוף כ-Artifact |
 | `INSTALL.md` | הוראות ההתקנה שקלוד עובד לפיהן |
 | `kit/CLAUDE.template.md` | חוקי הבית הכלליים (מותאמים אישית בהתקנה) |
 | `kit/agents/` | תשעת הסוכנים |
@@ -39,3 +54,8 @@
 
 ## בטיחות
 ההתקנה לא דורסת קבצים קיימים: קודם גיבוי ל-`~/.claude/backups/`, ואחר כך מיזוג. היא לא מבקשת סיסמאות או מפתחות, ולא מתקינה תוכנה בלי אישור.
+
+---
+נבנה על ידי **Think AI** · AI שעובד בתוך הארגון
+
+</div>
