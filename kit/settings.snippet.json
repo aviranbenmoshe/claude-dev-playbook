@@ -1,0 +1,71 @@
+{
+  "_comment": "Merge into ~/.claude/settings.json. Never replace the file. Replace {{HOOKS_DIR}} with the absolute path of ~/.claude/hooks using forward slashes (e.g. C:/Users/name/.claude/hooks or /Users/name/.claude/hooks). Keep existing allow rules, hooks and plugins.",
+  "permissions": {
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin HEAD:main:*)",
+      "Bash(git push origin master:*)",
+      "Bash(git reset --hard origin:*)",
+      "Bash(terraform destroy:*)",
+      "Bash(supabase db reset --linked:*)",
+      "Bash(npx supabase db reset --linked:*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)"
+    ],
+    "ask": [
+      "Bash(rm -rf:*)",
+      "Bash(git push origin dev:*)",
+      "Bash(supabase db push:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(fly deploy:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{HOOKS_DIR}}/require-git.js\"",
+            "timeout": 10,
+            "onFailure": "block",
+            "statusMessage": "בודק שיש git"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit *)",
+            "command": "node \"{{HOOKS_DIR}}/secret-scan.js\"",
+            "timeout": 30,
+            "onFailure": "block",
+            "statusMessage": "בודק שאין סודות ב-commit"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{HOOKS_DIR}}/verify-on-stop.js\"",
+            "timeout": 600,
+            "statusMessage": "מריץ בדיקות לפני סיום"
+          }
+        ]
+      }
+    ]
+  },
+  "effortLevel": "medium"
+}
