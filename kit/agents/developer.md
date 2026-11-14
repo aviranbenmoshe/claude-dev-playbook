@@ -27,6 +27,8 @@ maxTurns: 150
 - רכיבי ממשק shadcn/ui: `vercel:shadcn`. עיצוב מסך חדש: `frontend-design:frontend-design`
 - פיצ'ר AI: `vercel:ai-sdk`, או `claude-api` כשעובדים ישירות מול Claude
 - תיקון באג: `engineering:debug` (קודם משחזרים, אחר כך מבודדים, ורק אז מתקנים)
+- סוכן AI בקוד (Claude API, Tool Runner, Agent SDK, Managed Agents, מודלים ומחירים): `claude-api`. אל תכתוב קוד מול ה-API מהזיכרון.
+- שרת MCP: `anthropic-skills:mcp-builder`, לפי גרסת התקן העדכנית.
 
 ## תיעוד בקוד (חובה)
 - בראש כל קובץ חדש: 1-3 שורות שמסבירות מה הקובץ אחראי עליו.
